@@ -1,0 +1,331 @@
+digraph G {
+
+  graph [labeljust=l]
+  bgcolor="{{styles.graph.fillcolor}}"
+
+  compound=true
+  rankdir=LR
+  ranksep=0.8
+  # ratio=0.8
+  pad=0.3
+  // splines="polyline"
+  fontname = "{{styles.graph.fontname}}"
+
+  label="Automatically generated with json2gv.py\nhttps://github.com/l2fprod/vpc-diagram-exporter"
+
+  node [
+    fontname = "{{styles.graph.fontname}}"
+    fontsize=12
+    fontcolor="{{styles.node.fontcolor}}"
+    width=1.1
+    shape = "box"
+  ]
+  edge [
+    fontname = "{{styles.graph.fontname}}"
+    fontsize=8
+    fontcolor="{{styles.node.fontcolor}}"
+    color="{{styles.edge.color}}"
+    arrowhead="vee"
+    style="dotted"
+  ]
+
+  internet [
+    label = "\nInternet\n "
+    shape = "egg"
+    fontsize=16
+    style="filled"
+    color="{{styles.internet.color}}"
+    fillcolor="{{styles.internet.fillcolor}}"
+    fontcolor="{{styles.internet.fontcolor}}"
+  ]
+
+  // force the internet outside of IBM Cloud
+  subgraph cluster_internet {
+    label = ""
+    color = "{{styles.graph.fillcolor}}"
+    internet
+  }
+
+  // force security groups outside of IBM Cloud
+  subgraph cluster_security_groups {
+    label = ""
+    color = "{{styles.graph.fillcolor}}"
+
+    // SECURITY GROUPS
+    {% for vpc in data.vpcs %}
+    {% for group in data['security-groups'] %}
+    {% if vpc.id == group.vpc.id %}
+    "{{ group.id }}" [
+      label = <
+      <TABLE border="0">
+      <TR><TD colspan="4"><B>{{group.name}}</B></TD></TR>
+      <TR>
+      <TD>direction</TD>
+      <TD>protocol</TD>
+      <TD>ports</TD>
+      <TD>remote</TD>
+      </TR>
+      {% if group.rules %}
+      {% for rule in group.rules %}
+      <TR>
+      <TD>{{rule.direction}}</TD>
+      <TD>{{rule.protocol}}</TD>
+      <TD>{{rule.port_min}} - {{rule.port_max}}</TD>
+      <TD>{%if rule.remote %}{{rule.remote.cidr_block}}{{rule.remote.name}}{% endif %}</TD>
+      </TR>
+      {% endfor %}
+      {% endif %}
+      </TABLE>
+      >
+      style="rounded"
+      shape="folder"
+    ]
+    {% endif %}
+    {% endfor %}
+    {% endfor %}
+  }
+
+  subgraph cluster_ibmcloud {
+    label = <<BR/>  IBM Cloud>
+    color = "{{styles.ibmcloud.color}}"
+    fillcolor = "{{styles.ibmcloud.color}}"
+    style = "rounded, filled"
+
+    // VPCs
+    {% for vpc in data.vpcs %}
+    subgraph "cluster_{{ vpc.id }}" {
+      label = <<BR/>  {{ vpc.name }} <I>({{ vpc.status }})</I>>
+      color = "{{styles.vpc.color}}"
+      fillcolor = "{{styles.vpc.color}}"
+      style = "rounded, filled"
+
+      // REGIONS
+      {% for region in data.regions %}
+      subgraph "cluster_{{vpc.id}}_{{ region.name }}" {
+        label = <<BR/>  {{region.name }}>
+        color = "{{styles.region.color}}"
+        fillcolor = "{{styles.region.fillcolor}}"
+        style = "rounded, dotted, filled"
+        
+        {% for zone in region.zones %}
+        subgraph "cluster_{{vpc.id}}_{{ zone.name }}" {
+          label = <<BR/>  {{ zone.name }}>
+          fillcolor = "{{styles.zone.fillcolor}}"
+          style = "rounded, dashed, filled"
+
+          // PUBLIC GATEWAYS
+          {% for pgw in data['public-gateways'] %}
+            {% if pgw.vpc.id == vpc.id and pgw.zone.name == zone.name %}
+            "{{pgw.id}}" [
+              label=<
+                <TABLE border="0">
+                <TR><TD>{{pgw.name}}</TD></TR>
+                {% if pgw.floating_ip %}
+                <TR><TD>{{pgw.floating_ip.address}}</TD></TR>
+                {% endif %}
+                </TABLE>
+              >
+              style = "filled"
+              shape = "box3d"
+            ]
+
+            "{{pgw.id}}" -> internet
+            {% endif %}
+          {% endfor %}
+          
+          // SUBNETS
+          {% if vpc.subnets|length == 0 %}
+            "empty-{{vpc.id}}" [ label="<empty>" ]
+          {% endif %}
+
+          {% for subnet in vpc.subnets %}
+            {% if subnet.vpc.id == vpc.id and subnet.zone.name == zone.name %}
+              subgraph "cluster_{{ subnet.id }}" {
+                label = <<BR/>  {{ subnet.name }} - {{ subnet.ipv4_cidr_block }} <I>({{ subnet.status }})</I>>
+                fillcolor = "{{styles.subnet.fillcolor}}"
+                style = "rounded, filled"
+
+                // invisible node to be able to attach Network ACLs
+                "{{ subnet.id }}" [
+                  style="invis"
+                ]
+
+                {% if subnet.instances|length == 0 %}
+                  "empty-{{subnet.id}}" [ label="<empty>" ]
+                {% endif %}
+
+                // SERVERS in this SUBNET
+                {% for server in subnet.instances %}
+                    "{{ server.id }}" [
+                      label = <
+                      <TABLE BORDER="0">
+                      <TR><TD><B>{{ server.name }}</B> <I>({{ server.status }})</I></TD></TR>
+                      <TR><TD><I>{{ server.cpu.cores }} cores, {{ server.memory }}GB, {{ server.image.name }}</I></TD></TR>
+
+                      {% for volume in data.volumes %}
+                        {% for attachment in volume.volume_attachments %}
+                        {% if attachment.instance and attachment.instance.id == server.id %}
+                        <TR><TD><I>volume {{ attachment.type }} - {{ volume.capacity }}GB, {{ volume.iops }}iops ({{ volume.status }})</I></TD></TR>
+                        {% endif %}
+                        {% endfor %}
+                      {% endfor %}
+
+                      {% for nic in server.network_interfaces %}
+                      <TR><TD>{{ nic.primary_ipv4_address }}</TD></TR>
+                        {% for fip in nic.floating_ips %}
+                          <TR><TD>{{ fip.address }} ({{ fip.name }})</TD></TR>
+                        {% endfor %}
+                      {% endfor %}
+
+                      </TABLE>
+                      >
+                      style="filled"
+                      color="{{styles.server.color}}"
+                      fillcolor="{{styles.server.fillcolor}}"
+                      fontcolor="{{styles.server.fontcolor}}"
+                      shape="box3d"
+                    ]
+
+                    {% for nic in server.network_interfaces %}
+                      // LINK SERVER to ITS SECURITY GROUPS
+                      {% for sg in nic.security_groups %}
+                        "{{ server.id }}" -> "{{ sg.id }}"
+                      {% endfor %}
+
+                      // IF THE SERVER HAS A FLOATING IP, IT CAN BE REACHED FROM THE INTERNET
+                      {% if nic.floating_ips %}
+                      internet -> "{{ server.id }}"
+                      {% endif %}
+                    {% endfor %}
+
+                {% endfor %}
+              }
+            {% endif %}
+          {% endfor %}
+        }
+        {% endfor %}
+      }
+      {% endfor %}
+    }
+    {% endfor %}
+  }
+
+  // VPN GATEWAYS
+  {% for vpc in data.vpcs %}
+    {% set rendered = [] %}
+    {% for subnet in vpc.subnets %}
+      {% for vpn in data['vpn-gateways'] %}
+        {% if vpn.subnet.id == subnet.id %}
+          {% if vpn.id not in rendered %}
+            {% if rendered.append(vpn.id) %}{% endif %}
+  "{{ vpn.id }}" [
+    label = <
+    <TABLE border="0">
+    <TR><TD colspan="2"><B>{{vpn.name}}</B> <I>({{ vpn.status }})</I></TD></TR>
+    <TR>
+      <TD>Public IP</TD>
+      <TD>{{vpn.public_ip.address}}</TD>
+    </TR>
+    {% if vpn.connections %}
+    <TR>
+    {% for conn in vpn.connections %}
+      <TD>{{conn.name}}</TD>
+      <TD>{{conn.peer_address}} ({{conn.status}})</TD>
+    {% endfor %}
+    </TR>
+    {% endif %}
+    </TABLE>
+    >
+    shape="component"
+  ]
+          {% endif %}
+  // vpn -> subnet
+  "{{ vpn.id }}" -> "{{ subnet.id }}" [lhead="cluster_{{ subnet.id }}" style="dashed" label="VPN"]
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  {% endfor %}
+
+  // LOAD BALANCERS
+  {% for vpc in data.vpcs %}
+    {% set rendered = [] %}
+    {% for subnet in vpc.subnets %}
+      {% for lb in data['load-balancers'] %}
+        {% if lb.subnets %}
+          {% for attachedSubnet in lb.subnets %}
+            {% if attachedSubnet.id == subnet.id %}
+              {% if lb.id not in rendered %}
+                {% if rendered.append(lb.id) %}{% endif %}
+  "{{ lb.id }}" [
+    label = <
+    <TABLE border="0">
+    <TR><TD colspan="2"><B>{{lb.name}}</B> <I>({{ lb.provisioning_status }})</I></TD></TR>
+    <TR>
+      <TD>Public IPs</TD>
+      <TD>{% if lb.public_ips %}{% for ip in lb.public_ips %}{{ip.address}}<BR/>{% endfor %}{% endif %}</TD>
+    </TR>
+    <TR>
+      <TD>Private IPs</TD>
+      <TD>{% if lb.private_ips %}{% for ip in lb.private_ips %}{{ip.address}}<BR/>{% endfor %}{% endif %}</TD>
+    </TR>
+    </TABLE>
+    >
+    shape="box3d"
+  ]
+              {% endif %}
+  // lb -> subnet
+  "{{ lb.id }}" -> "{{ subnet.id }}" [lhead="cluster_{{ subnet.id }}" style="dashed" label="Load Balancer"]
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  {% endfor %}
+
+  // NETWORK ACLS
+  {% for vpc in data.vpcs %}
+    {% set rendered = [] %}
+      {% for subnet in vpc.subnets %}
+        {% for acl in data['network-acls'] %}
+          {% if acl.subnets %}
+            {% for attachedSubnet in acl.subnets %}
+              {% if attachedSubnet.id == subnet.id %}
+                {% if acl.id not in rendered %}
+                  {% if rendered.append(acl.id) %}{% endif %}
+  "{{ acl.id }}" [
+    label = <
+    <TABLE border="0">
+    <TR><TD colspan="4"><B>{{acl.name}}</B></TD></TR>
+    <TR>
+    <TD>action</TD>
+    <TD>direction</TD>
+    <TD>protocol</TD>
+    <TD>source</TD>
+    <TD>destination</TD>
+    <TD>ports</TD>
+    </TR>
+    {% for rule in acl.rules %}
+    <TR>
+    <TD>{{rule.action}}</TD>
+    <TD>{{rule.direction}}</TD>
+    <TD>{{rule.protocol}}</TD>
+    <TD>{{rule.source}}</TD>
+    <TD>{{rule.destination}}</TD>
+    <TD>{{rule.port_min}} - {{rule.port_max}}</TD>
+    </TR>
+    {% endfor %}
+    </TABLE>
+    >
+    style="rounded"
+    shape="folder"
+  ]
+              {% endif %}
+  // acl -> subnet
+  "{{ acl.id }}" -> "{{ subnet.id }}" [lhead="cluster_{{ subnet.id }}"]
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  {% endfor %}
+}

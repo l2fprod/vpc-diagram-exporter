@@ -1,0 +1,5 @@
+sh
+Jinja2
+colorama #https://github.com/tartley/colorama
+futures
+python-dotenv

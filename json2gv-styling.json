@@ -1,0 +1,42 @@
+{
+  "graph": {
+    "fillcolor": "#FFFFFF",
+    "fontname": "IBM Plex Sans"
+  },
+  "node": {
+    "color": "#788893",
+    "fontcolor": "#646365"
+  },
+  "edge": {
+    "color": "#000000",
+    "fontcolor": "#646365"
+  },
+  "ibmcloud": {
+    "color": "#9fd1f0"
+  },
+  "vpc": {
+    "color": "#96b1b6"
+  },
+  "region": {
+    "color": "#000000",
+    "fillcolor": "#e2f7f5"
+  },
+  "zone": {
+    "color": "",
+    "fillcolor": "#dbcabf"
+  },
+  "subnet": {
+    "color": "",
+    "fillcolor": "#FFFFFF"
+  },
+  "server": {
+    "color": "#000000",
+    "fillcolor": "#d69e8e",
+    "fontcolor": "#000000"
+  },
+  "internet": {
+    "color": "#7bbb98",
+    "fillcolor": "#7bbb98",
+    "fontcolor": "#000000"
+  }
+}
