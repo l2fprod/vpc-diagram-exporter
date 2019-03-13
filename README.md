@@ -24,8 +24,11 @@ Use this tool to export a visual representation of the existing VPC resources in
    ```
    vpc-diagram-exporter
    ```
+1. Find your exported diagrams (one PNG per VPC) in the `output` folder.
 
-## Prerequisites
+## Or go manual
+
+### Prerequisites
 
 To use the tool and deploy the VPC examples, you will need:
 
@@ -36,7 +39,7 @@ To use the tool and deploy the VPC examples, you will need:
 
 If you want to save yourself some time in the future, use [my IBM Cloud CLI docker image](https://github.com/l2fprod/bxshell) ;)
 
-## Before you begin
+### Before you begin
 
 The tool is written in Python with a small set of helpers to wrap the `ibmcloud` CLI so you can benefit from Python language features to interact with the VPC API.
 
@@ -52,9 +55,7 @@ The tool is written in Python with a small set of helpers to wrap the `ibmcloud`
    ibmcloud is vpcs
    ```
 
-## A tool to generate a graph of your VPCs
-
-### First, export all VPC resources into one big JSON file
+### Export all VPC resources into one big JSON file
 
 `dump.py` exports all VPC resources into a big JSON files. It calls the *ibmcloud* command and requires the *is* plugin. If *ibmcloud is vpcs* works in your environment, the script should work too.
 
@@ -64,7 +65,7 @@ The tool is written in Python with a small set of helpers to wrap the `ibmcloud`
 
 The script runs a few commands and produces `output/all.json`
 
-### Then convert the JSON into GraphViz
+### Convert the JSON into GraphViz
 
 `json2gv.py` produces a [Graphviz](https://www.graphviz.org/) diagram of the elements in `output/all.json`. It uses a Jinja2 template to convert the JSON exported earlier into one Graphviz file per VPC (*vpcname.gv*) under the `output` folder.
 
@@ -74,7 +75,7 @@ To get the Graphviz input:
    ./json2gv.py
    ```
 
-### And finally images!
+### Generate PNG images
 
 To generate a PNG for all VPCs (all graphvizs in the folder):
 
