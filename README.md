@@ -1,5 +1,11 @@
 # Generates a diagram of IBM Cloud VPC resources
 
+[![Build Status](https://travis-ci.org/l2fprod/vpc-diagram-exporter.svg?branch=master)](https://travis-ci.org/l2fprod/vpc-diagram-exporter)
+
+Use this tool to export a visual representation of the existing VPC resources in your IBM Cloud account
+
+![VPC diagram](example.png)
+
 ## Try it now with the Docker image
 
 1. The Docker image has all required dependencies. Just run:
