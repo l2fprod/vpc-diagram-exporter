@@ -1,0 +1,2 @@
+#!/bin/sh
+dump.py && rm -f output/*.gv output/*.gv.png && json2gv.py && find output -name '*.gv' -exec dot {} -Tpng -o{}.png \;
