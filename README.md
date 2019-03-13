@@ -2,7 +2,9 @@
 
 [![Build Status](https://travis-ci.org/l2fprod/vpc-diagram-exporter.svg?branch=master)](https://travis-ci.org/l2fprod/vpc-diagram-exporter)
 
-Use this tool to export a visual representation of the existing VPC resources in your IBM Cloud account
+Use this tool to export a visual representation of the existing VPC resources in your IBM Cloud account.
+
+`ibmcloud is` :arrow_right: JSON :arrow_right: [GraphViz](https://www.graphviz.org/) :arrow_right: PNG
 
 ![VPC diagram](example.png)
 
