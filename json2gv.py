@@ -2,16 +2,25 @@
 #
 # take a big JSON of VPC resources and renders a Graphviz file
 #
+import inspect
+import os
+import sys
 import json
 from jinja2 import Template
+
+def get_script_dir(follow_symlinks=True):
+  path = inspect.getabsfile(get_script_dir)
+  if follow_symlinks:
+    path = os.path.realpath(path)
+  return os.path.dirname(path)
 
 with open('output/all.json', 'r') as allFile:
   all = json.load(allFile)
 
-with open('json2gv-styling.json', 'r') as styleFile:
+with open(get_script_dir() + '/json2gv-styling.json', 'r') as styleFile:
   styles = json.load(styleFile)
 
-with open('render-to-gv.j2', 'r') as templateFile:
+with open(get_script_dir() + '/render-to-gv.j2', 'r') as templateFile:
   template = Template(templateFile.read().decode('utf8'))
 
 # generate one graphviz per vpc
