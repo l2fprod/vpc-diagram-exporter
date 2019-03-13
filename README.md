@@ -1,5 +1,24 @@
 # Generates a diagram of IBM Cloud VPC resources
 
+## Try it now with the Docker image
+
+1. The Docker image has all required dependencies. Just run:
+   ```
+   docker run --rm --volume $HOME:/home -it l2fprod/vpc-diagram-exporter
+   ```
+1. Once the container is running, log in your IBM Cloud account inside the container:
+   ```
+   ibmcloud login
+   ```
+1. Change to a directory under the `home` volume
+   ```
+   cd /home/...path-to-my-project-where-files-will-be-created/
+   ```
+1. Run the export script, it will create an `output` folder in the current directory:
+   ```
+   vpc-diagram-exporter
+   ```
+
 ## Prerequisites
 
 To use the tool and deploy the VPC examples, you will need:
@@ -76,6 +95,7 @@ Or to generate a PNG for a specific VPC:
    ```sh
    ./dump.py && rm -f output/*.gv output/*.gv.svg && ./json2gv.py && find output -name '*.gv' -exec dot {} -Tsvg -o{}.svg \;
    ```
+
 ## License
 
 This project is licensed under the Apache License Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0).
