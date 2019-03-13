@@ -192,9 +192,9 @@ digraph G {
                         "{{ server.id }}" -> "{{ sg.id }}"
                       {% endfor %}
 
-                      // IF THE SERVER HAS A FLOATING IP, IT CAN BE REACHED FROM THE INTERNET
+                      // IF THE SERVER HAS A FLOATING IP, IT HAS INBOUND/OUTBOUND ACCESS FROM/TO THE INTERNET
                       {% if nic.floating_ips %}
-                      internet -> "{{ server.id }}"
+                      internet -> "{{ server.id }}" [dir="both"]
                       {% endif %}
                     {% endfor %}
 
