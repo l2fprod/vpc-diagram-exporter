@@ -21,6 +21,10 @@
     "color": "#000000",
     "fillcolor": "#e2f7f5"
   },
+  "lb": {
+    "color": "#000000",
+    "fillcolor": "#a7e2fb"
+  },
   "zone": {
     "color": "",
     "fillcolor": "#dbcabf"
