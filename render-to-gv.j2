@@ -93,20 +93,20 @@ digraph G {
 
     // VPCs
     {% for vpc in data.vpcs %}
-    subgraph "cluster_{{ vpc.id }}" {
-      label = <<BR/>  {{ vpc.name }} <I>({{ vpc.status }})</I>>
-      color = "{{styles.vpc.color}}"
-      fillcolor = "{{styles.vpc.color}}"
-      style = "rounded, filled"
+    subgraph "cluster_{{vpc.id}}_{{ vpc.region }}" {
+      label = <<BR/>  {{vpc.region }}>
+      color = "{{styles.region.color}}"
+      fillcolor = "{{styles.region.fillcolor}}"
+      style = "rounded, dotted, filled"
+
+      subgraph "cluster_{{ vpc.id }}" {
+        label = <<BR/>  {{ vpc.name }} <I>({{ vpc.status }}) </I>>
+        color = "{{styles.vpc.color}}"
+        fillcolor = "{{styles.vpc.color}}"
+        style = "rounded, filled"
 
       // REGIONS
       {% for region in data.regions %}
-      subgraph "cluster_{{vpc.id}}_{{ region.name }}" {
-        label = <<BR/>  {{region.name }}>
-        color = "{{styles.region.color}}"
-        fillcolor = "{{styles.region.fillcolor}}"
-        style = "rounded, dotted, filled"
-        
         {% for zone in region.zones %}
         subgraph "cluster_{{vpc.id}}_{{ zone.name }}" {
           label = <<BR/>  {{ zone.name }}>
@@ -204,8 +204,8 @@ digraph G {
           {% endfor %}
         }
         {% endfor %}
-      }
       {% endfor %}
+      }
     }
     {% endfor %}
   }
