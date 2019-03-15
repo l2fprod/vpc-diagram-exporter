@@ -56,6 +56,16 @@ for vpc in all['vpcs']:
 for subnet in all['subnets']:
   vpcIdToVPC[subnet['vpc']['id']]['subnets'].append(subnet)
 
+# set the VPC region to the region of the first subnet
+for vpc in all['vpcs']:
+  if len(vpc['subnets']) > 0:
+    subnetZone = vpc['subnets'][0]['zone']['name']
+    # find the region with this zone
+    for region in all['regions']:
+      for zone in region['zones']:
+        if (zone['name'] == subnetZone):
+          vpc['region'] = region['name']
+
 # map subnet id to subnet
 subnetIdToSubnet = {}
 for subnet in all['subnets']:
