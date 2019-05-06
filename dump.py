@@ -101,6 +101,10 @@ for server in all['instances']:
 for vpn in all['vpn-gateways']:
   vpn['connections'] = ibmcloudj('is', 'vpn-gateway-connections', vpn['id'])
 
+# retrieve VPC address prefixes
+for vpc in all['vpcs']:
+  vpc['address_prefixes'] = ibmcloudj('is', 'vpc-address-prefixes', vpc['id'])
+
 # save the output
 if not os.path.exists('output'):
   os.makedirs('output')

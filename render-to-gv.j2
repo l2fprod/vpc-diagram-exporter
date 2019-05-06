@@ -210,6 +210,31 @@ digraph G {
     {% endfor %}
   }
 
+  // vpc address prefixes
+  {% for vpc in data.vpcs %}
+    "{{ vpc.id }}_address_prefixes" [
+      label = <
+      <TABLE BORDER="0">
+      <TR><TD colspan="2"><B>address prefixes</B></TD></TR>
+      <TR>
+        <TD>zone</TD>
+        <TD>cidr</TD>
+      </TR>
+      {% for prefix in vpc.address_prefixes %}
+      <TR>
+        <TD>{{prefix.zone.name}}</TD>
+        <TD>{{prefix.cidr}}</TD>
+      </TR>
+      {% endfor %}
+      </TABLE>
+      >
+      shape="component"
+      style="filled"
+      color = "{{styles.address_prefixes.color}}"
+      fillcolor = "{{styles.address_prefixes.fillcolor}}"
+    ]
+  {% endfor %}
+
   // VPN GATEWAYS
   {% for vpc in data.vpcs %}
     {% set rendered = [] %}

@@ -17,6 +17,10 @@
   "vpc": {
     "color": "#96b1b6"
   },
+  "address_prefixes": {
+    "color": "#000000",
+    "fillcolor": "#FFFFFF"
+  },
   "region": {
     "color": "#000000",
     "fillcolor": "#e2f7f5"
