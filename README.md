@@ -37,7 +37,7 @@ To use the tool and deploy the VPC examples, you will need:
 * Python 2.7.1
 * pip
 * [graphviz](https://www.graphviz.org/) (`brew install graphviz`) on a mac
-* *infrastructure-service* plugin for *ibmcloud* (`ibmcloud plugin install infrastructure-service`)
+* *vpc-infrastructure* plugin for *ibmcloud* (`ibmcloud plugin install vpc-infrastructure`)
 
 If you want to save yourself some time in the future, use [my IBM Cloud CLI docker image](https://github.com/l2fprod/bxshell) ;)
 
@@ -104,6 +104,10 @@ Or to generate a PNG for a specific VPC:
    ```sh
    ./dump.py && rm -f output/*.gv output/*.gv.svg && ./json2gv.py && find output -name '*.gv' -exec dot {} -Tsvg -o{}.svg \;
    ```
+
+## Documentation 
+
+- [IBM Cloud Virtual Private Cloud](https://cloud.ibm.com/docs/vpc-on-classic?topic=vpc-on-classic-getting-started)
 
 ## License
 
