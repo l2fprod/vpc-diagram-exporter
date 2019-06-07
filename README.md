@@ -18,6 +18,10 @@ Use this tool to export a visual representation of the existing VPC resources in
    ```
    ibmcloud login
    ```
+1. Set the VPC target generation:
+   ```
+   ibmcloud is target --gen 1
+   ```
 1. Change to a directory under the `home` volume
    ```
    cd /home/...path-to-my-project-where-files-will-be-created/
