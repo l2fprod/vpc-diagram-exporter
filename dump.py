@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # dump all VPC resources
 #
@@ -87,7 +87,7 @@ for server in all['instances']:
 
 # replace the floating ip references under nic with the actual fip
 for nic in all['nics']:
-  if nic.has_key('floating_ips'):
+  if 'floating_ips' in nic:
     for fipIndex, fip in enumerate(nic['floating_ips']):
       nic['floating_ips'][fipIndex] = fipNameToFloatingIP[fip['name']]
 

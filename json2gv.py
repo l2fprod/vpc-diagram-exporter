@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # take a big JSON of VPC resources and renders a Graphviz file
 #
@@ -21,13 +21,14 @@ with open(get_script_dir() + '/json2gv-styling.json', 'r') as styleFile:
   styles = json.load(styleFile)
 
 with open(get_script_dir() + '/render-to-gv.j2', 'r') as templateFile:
-  template = Template(templateFile.read().decode('utf8'))
+  template = Template(templateFile.read())
 
 # generate one graphviz per vpc
 vpcs = all['vpcs']
 for vpc in vpcs:
   all['vpcs'] = [ 1 ]
   all['vpcs'][0] = vpc
+  all['vpc'] = vpc
   print('>>> Generating {0}'.format('output/' + vpc['name'] + '.gv'))
   with open('output/' + vpc['name'] + '.gv', 'w') as allOutputFile:
-    allOutputFile.write(template.render(data=all, styles=styles).encode('utf8'))
+    allOutputFile.write(template.render(data=all, styles=styles))

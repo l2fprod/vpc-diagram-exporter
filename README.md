@@ -34,8 +34,8 @@ Use this tool to export a visual representation of the existing VPC resources in
 
 To use the tool and deploy the VPC examples, you will need:
 
-* Python 2.7.1
-* pip
+* Python 3
+* pip3
 * [graphviz](https://www.graphviz.org/) (`brew install graphviz`) on a mac
 * *infrastructure-service* plugin for *ibmcloud* (`ibmcloud plugin install infrastructure-service`)
 
@@ -48,7 +48,7 @@ The tool is written in Python with a small set of helpers to wrap the `ibmcloud`
 1. Install Python requirements:
 
    ```sh
-   pip install -r requirements.txt
+   pip3 install -r requirements.txt
    ```
 
 1. Make sure your VPC environment is correctly configured:
@@ -62,7 +62,7 @@ The tool is written in Python with a small set of helpers to wrap the `ibmcloud`
 `dump.py` exports all VPC resources into a big JSON files. It calls the *ibmcloud* command and requires the *is* plugin. If *ibmcloud is vpcs* works in your environment, the script should work too.
 
    ```sh
-   ./dump.py
+   python3 dump.py
    ```
 
 The script runs a few commands and produces `output/all.json`
@@ -74,7 +74,7 @@ The script runs a few commands and produces `output/all.json`
 To get the Graphviz input:
 
    ```sh
-   ./json2gv.py
+   python3 json2gv.py
    ```
 
 ### Generate PNG images
@@ -96,13 +96,13 @@ Or to generate a PNG for a specific VPC:
 **PNG**
 
    ```sh
-   ./dump.py && rm -f output/*.gv output/*.gv.png && ./json2gv.py && find output -name '*.gv' -exec dot {} -Tpng -o{}.png \;
+   python3 dump.py && rm -f output/*.gv output/*.gv.png && python3 json2gv.py && find output -name '*.gv' -exec dot {} -Tpng -o{}.png \;
    ```
 
 **SVG**
 
    ```sh
-   ./dump.py && rm -f output/*.gv output/*.gv.svg && ./json2gv.py && find output -name '*.gv' -exec dot {} -Tsvg -o{}.svg \;
+   python3 dump.py && rm -f output/*.gv output/*.gv.svg && python3 json2gv.py && find output -name '*.gv' -exec dot {} -Tsvg -o{}.svg \;
    ```
 
 ## License
