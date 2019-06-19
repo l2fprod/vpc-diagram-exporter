@@ -36,7 +36,7 @@ Use this tool to export a visual representation of the existing VPC resources in
 
 ### Prerequisites
 
-To use the tool and deploy the VPC examples, you will need:
+You will need:
 
 * Python 3
 * pip3
