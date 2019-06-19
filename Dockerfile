@@ -14,7 +14,7 @@ RUN curl -fsSL https://clis.ng.bluemix.net/install/linux > /tmp/bxinstall.sh && 
   sh /tmp/bxinstall.sh && \
   rm /tmp/bxinstall.sh
 
-RUN ibmcloud plugin install infrastructure-service -f -r "IBM Cloud"
+RUN ibmcloud plugin install vpc-infrastructure -f -r "IBM Cloud"
 
 COPY vpc-diagram-exporter dump.py helpers.py json2gv-styling.json json2gv.py render-to-gv.j2 requirements.txt /app/
 RUN cd /app && pip3 install -r requirements.txt
