@@ -160,7 +160,7 @@ digraph G {
                       label = <
                       <TABLE BORDER="0">
                       <TR><TD><B>{{ server.name }}</B> <I>({{ server.status }})</I></TD></TR>
-                      <TR><TD><I>{{ server.cpu.cores }} cores, {{ server.memory }}GB, {{ server.image.name }}</I></TD></TR>
+                      <TR><TD><I>{{ server.cpu.cores }} cores, {{ server.memory }}GB{% if server.image %}, {{ server.image.name }}{% endif %}</I></TD></TR>
 
                       {% for volume in data.volumes %}
                         {% for attachment in volume.volume_attachments %}
