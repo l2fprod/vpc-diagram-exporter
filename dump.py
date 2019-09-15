@@ -25,27 +25,37 @@ with ThreadPoolExecutor(max_workers=5) as e:
   vpns = e.submit(ibmcloudj, 'is', 'vpn-gateways')
   volumes = e.submit(ibmcloudj, 'is', 'volumes')
 
+def get_result(call):
+  try:
+    return call.result()
+  except Exception as err:
+    print(err)
+    return []
+
 all = {
-  'floating-ips': floatingips.result(),
-  'images': images.result(),
-  'ike-policies': ikePolicies.result(),
-  'instances': instances.result(),
-  'instance-profiles': instanceProfiles.result(),
-  'ipsec-policies': ipsecPolicies.result(),
-  'keys': keys.result(),
-  'load-balancers': loadBalancers.result(),
-  'network-acls': networkAcls.result(),
-  'public-gateways': publicGateways.result(),
-  'regions': regions.result(),
-  'security-groups': securityGroups.result(),
-  'subnets': subnets.result(),
-  'vpcs': vpcs.result(),
-  'vpn-gateways': vpns.result(),
-  'volumes': volumes.result(),
+  'floating-ips': get_result(floatingips),
+  'images': get_result(images),
+  'ike-policies': get_result(ikePolicies),
+  'instances': get_result(instances),
+  'instance-profiles': get_result(instanceProfiles),
+  'ipsec-policies': get_result(ipsecPolicies),
+  'keys': get_result(keys),
+  'load-balancers': get_result(loadBalancers),
+  'network-acls': get_result(networkAcls),
+  'public-gateways': get_result(publicGateways),
+  'regions': get_result(regions),
+  'security-groups': get_result(securityGroups),
+  'subnets': get_result(subnets),
+  'vpcs': get_result(vpcs),
+  'vpn-gateways': get_result(vpns),
+  'volumes': get_result(volumes),
 }
 
 # add the VPCs with classic access
-all['vpcs'].extend(ibmcloudj('is', 'vpcs', '--classic-access'))
+try:
+  all['vpcs'].extend(ibmcloudj('is', 'vpcs', '--classic-access'))
+except:
+  all['vpcs'].extend(ibmcloudj('is', 'vpcs'))
 
 # add zones
 for region in all['regions']:
