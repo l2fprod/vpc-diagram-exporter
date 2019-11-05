@@ -97,7 +97,7 @@ for server in all['instances']:
 
 # replace the floating ip references under nic with the actual fip
 for nic in all['nics']:
-  if 'floating_ips' in nic:
+  if 'floating_ips' in nic and nic['floating_ips']:
     for fipIndex, fip in enumerate(nic['floating_ips']):
       nic['floating_ips'][fipIndex] = fipNameToFloatingIP[fip['name']]
 
