@@ -51,12 +51,6 @@ all = {
   'volumes': get_result(volumes),
 }
 
-# add the VPCs with classic access
-try:
-  all['vpcs'].extend(ibmcloudj('is', 'vpcs', '--classic-access'))
-except:
-  all['vpcs'].extend(ibmcloudj('is', 'vpcs'))
-
 # add zones
 for region in all['regions']:
   region['zones'] = ibmcloudj('is', 'zones', region['name'])
