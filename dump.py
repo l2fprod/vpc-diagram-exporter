@@ -61,7 +61,8 @@ for vpc in all['vpcs']:
   vpcIdToVPC[vpc['id']] = vpc
   vpc['subnets'] = []
 for subnet in all['subnets']:
-  vpcIdToVPC[subnet['vpc']['id']]['subnets'].append(subnet)
+  if vpcIdToVPC[subnet['vpc']['id']]:
+    vpcIdToVPC[subnet['vpc']['id']]['subnets'].append(subnet)
 
 # set the VPC region to the region of the first subnet
 for vpc in all['vpcs']:

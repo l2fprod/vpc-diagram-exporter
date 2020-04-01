@@ -22,6 +22,10 @@ Use this tool to export a visual representation of the existing VPC resources in
    ```
    ibmcloud is target --gen 1
    ```
+   or
+   ```
+   ibmcloud is target --gen 2
+   ```
 1. Change to a directory under the `home` volume
    ```
    cd /home/...path-to-my-project-where-files-will-be-created/
@@ -59,6 +63,12 @@ The tool is written in Python with a small set of helpers to wrap the `ibmcloud`
 
    ```sh
    ibmcloud is vpcs
+   ```
+
+1. Unset the current target resource group so that all VPC elements are returned:
+   
+   ```sh
+   ibmcloud target --unset-resource-group
    ```
 
 ### Export all VPC resources into one big JSON file
