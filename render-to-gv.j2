@@ -172,9 +172,11 @@ digraph G {
 
                       {% for nic in server.network_interfaces %}
                       <TR><TD>{{ nic.primary_ipv4_address }}</TD></TR>
+                        {% if nic.floating_ips %}
                         {% for fip in nic.floating_ips %}
                           <TR><TD>{{ fip.address }} ({{ fip.name }})</TD></TR>
                         {% endfor %}
+                        {% endif %}
                       {% endfor %}
 
                       </TABLE>
