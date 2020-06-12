@@ -112,3 +112,6 @@ if not os.path.exists('output'):
   os.makedirs('output')
 with open('output/all.json', 'w') as outfile:
   json.dump(all, outfile, sort_keys=True, indent=2)
+
+if (len(all['vpcs']) == 0):
+  print('>>> No VPC found')
