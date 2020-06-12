@@ -105,107 +105,105 @@ digraph G {
         fillcolor = "{{styles.vpc.color}}"
         style = "rounded, filled"
 
-      // REGIONS
-      {% for region in data.regions %}
-        {% for zone in region.zones %}
-        subgraph "cluster_{{vpc.id}}_{{ zone.name }}" {
-          label = <<BR/>  {{ zone.name }}>
-          fillcolor = "{{styles.zone.fillcolor}}"
-          style = "rounded, dashed, filled"
+      // ZONES
+      {% for zone in data.region.zones %}
+      subgraph "cluster_{{vpc.id}}_{{ zone.name }}" {
+        label = <<BR/>  {{ zone.name }}>
+        fillcolor = "{{styles.zone.fillcolor}}"
+        style = "rounded, dashed, filled"
 
-          // PUBLIC GATEWAYS
-          {% for pgw in data['public-gateways'] %}
-            {% if pgw.vpc.id == vpc.id and pgw.zone.name == zone.name %}
-            "{{pgw.id}}" [
-              label=<
-                <TABLE border="0">
-                <TR><TD>{{pgw.name}}</TD></TR>
-                {% if pgw.floating_ip %}
-                <TR><TD>{{pgw.floating_ip.address}}</TD></TR>
-                {% endif %}
-                </TABLE>
-              >
-              style = "filled"
-              shape = "box3d"
-            ]
+        // PUBLIC GATEWAYS
+        {% for pgw in data['public-gateways'] %}
+          {% if pgw.vpc.id == vpc.id and pgw.zone.name == zone.name %}
+          "{{pgw.id}}" [
+            label=<
+              <TABLE border="0">
+              <TR><TD>{{pgw.name}}</TD></TR>
+              {% if pgw.floating_ip %}
+              <TR><TD>{{pgw.floating_ip.address}}</TD></TR>
+              {% endif %}
+              </TABLE>
+            >
+            style = "filled"
+            shape = "box3d"
+          ]
 
-            "{{pgw.id}}" -> internet
-            {% endif %}
-          {% endfor %}
-          
-          // SUBNETS
-          {% if vpc.subnets|length == 0 %}
-            "empty-{{vpc.id}}" [ label="<empty>" ]
+          "{{pgw.id}}" -> internet
           {% endif %}
+        {% endfor %}
+        
+        // SUBNETS
+        {% if vpc.subnets|length == 0 %}
+          "empty-{{vpc.id}}" [ label="<empty>" ]
+        {% endif %}
 
-          {% for subnet in vpc.subnets %}
-            {% if subnet.vpc.id == vpc.id and subnet.zone.name == zone.name %}
-              subgraph "cluster_{{ subnet.id }}" {
-                label = <<BR/>  {{ subnet.name }} - {{ subnet.ipv4_cidr_block }} <I>({{ subnet.status }})</I>>
-                fillcolor = "{{styles.subnet.fillcolor}}"
-                style = "rounded, filled"
+        {% for subnet in vpc.subnets %}
+          {% if subnet.vpc.id == vpc.id and subnet.zone.name == zone.name %}
+            subgraph "cluster_{{ subnet.id }}" {
+              label = <<BR/>  {{ subnet.name }} - {{ subnet.ipv4_cidr_block }} <I>({{ subnet.status }})</I>>
+              fillcolor = "{{styles.subnet.fillcolor}}"
+              style = "rounded, filled"
 
-                // invisible node to be able to attach Network ACLs
-                "{{ subnet.id }}" [
-                  style="invis"
-                ]
+              // invisible node to be able to attach Network ACLs
+              "{{ subnet.id }}" [
+                style="invis"
+              ]
 
-                {% if subnet.instances|length == 0 %}
-                  "empty-{{subnet.id}}" [ label="<empty>" ]
-                {% endif %}
+              {% if subnet.instances|length == 0 %}
+                "empty-{{subnet.id}}" [ label="<empty>" ]
+              {% endif %}
 
-                // SERVERS in this SUBNET
-                {% for server in subnet.instances %}
-                    "{{ server.id }}" [
-                      label = <
-                      <TABLE BORDER="0">
-                      <TR><TD><B>{{ server.name }}</B> <I>({{ server.status }})</I></TD></TR>
-                      <TR><TD><I>{% if server.cpu %}{{ server.cpu.cores }}{% endif %}{% if server.vcpu %}{{ server.vcpu.count }}{% endif %} cores, {{ server.memory }}GB{% if server.image %}, {{ server.image.name }}{% endif %}</I></TD></TR>
+              // SERVERS in this SUBNET
+              {% for server in subnet.instances %}
+                  "{{ server.id }}" [
+                    label = <
+                    <TABLE BORDER="0">
+                    <TR><TD><B>{{ server.name }}</B> <I>({{ server.status }})</I></TD></TR>
+                    <TR><TD><I>{% if server.cpu %}{{ server.cpu.cores }}{% endif %}{% if server.vcpu %}{{ server.vcpu.count }}{% endif %} cores, {{ server.memory }}GB{% if server.image %}, {{ server.image.name }}{% endif %}</I></TD></TR>
 
-                      {% for volume in data.volumes %}
-                        {% for attachment in volume.volume_attachments %}
-                        {% if attachment.instance and attachment.instance.id == server.id %}
-                        <TR><TD><I>volume {{ attachment.type }} - {{ volume.capacity }}GB, {{ volume.iops }}iops ({{ volume.status }})</I></TD></TR>
-                        {% endif %}
-                        {% endfor %}
+                    {% for volume in data.volumes %}
+                      {% for attachment in volume.volume_attachments %}
+                      {% if attachment.instance and attachment.instance.id == server.id %}
+                      <TR><TD><I>volume {{ attachment.type }} - {{ volume.capacity }}GB, {{ volume.iops }}iops ({{ volume.status }})</I></TD></TR>
+                      {% endif %}
                       {% endfor %}
-
-                      {% for nic in server.network_interfaces %}
-                      <TR><TD>{{ nic.primary_ipv4_address }}</TD></TR>
-                        {% if nic.floating_ips %}
-                        {% for fip in nic.floating_ips %}
-                          <TR><TD>{{ fip.address }} ({{ fip.name }})</TD></TR>
-                        {% endfor %}
-                        {% endif %}
-                      {% endfor %}
-
-                      </TABLE>
-                      >
-                      style="filled"
-                      color="{{styles.server.color}}"
-                      fillcolor="{{styles.server.fillcolor}}"
-                      fontcolor="{{styles.server.fontcolor}}"
-                      shape="box3d"
-                    ]
+                    {% endfor %}
 
                     {% for nic in server.network_interfaces %}
-                      // LINK SERVER to ITS SECURITY GROUPS
-                      {% for sg in nic.security_groups %}
-                        "{{ server.id }}" -> "{{ sg.id }}"
-                      {% endfor %}
-
-                      // IF THE SERVER HAS A FLOATING IP, IT HAS INBOUND/OUTBOUND ACCESS FROM/TO THE INTERNET
+                    <TR><TD>{{ nic.primary_ipv4_address }}</TD></TR>
                       {% if nic.floating_ips %}
-                      internet -> "{{ server.id }}" [dir="both"]
+                      {% for fip in nic.floating_ips %}
+                        <TR><TD>{{ fip.address }} ({{ fip.name }})</TD></TR>
+                      {% endfor %}
                       {% endif %}
                     {% endfor %}
 
-                {% endfor %}
-              }
-            {% endif %}
-          {% endfor %}
-        }
+                    </TABLE>
+                    >
+                    style="filled"
+                    color="{{styles.server.color}}"
+                    fillcolor="{{styles.server.fillcolor}}"
+                    fontcolor="{{styles.server.fontcolor}}"
+                    shape="box3d"
+                  ]
+
+                  {% for nic in server.network_interfaces %}
+                    // LINK SERVER to ITS SECURITY GROUPS
+                    {% for sg in nic.security_groups %}
+                      "{{ server.id }}" -> "{{ sg.id }}"
+                    {% endfor %}
+
+                    // IF THE SERVER HAS A FLOATING IP, IT HAS INBOUND/OUTBOUND ACCESS FROM/TO THE INTERNET
+                    {% if nic.floating_ips %}
+                    internet -> "{{ server.id }}" [dir="both"]
+                    {% endif %}
+                  {% endfor %}
+
+              {% endfor %}
+            }
+          {% endif %}
         {% endfor %}
+      }
       {% endfor %}
       }
     }

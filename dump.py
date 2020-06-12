@@ -18,12 +18,12 @@ with ThreadPoolExecutor(max_workers=5) as e:
   loadBalancers = e.submit(ibmcloudj, 'is', 'load-balancers')
   networkAcls = e.submit(ibmcloudj, 'is', 'network-acls')
   publicGateways = e.submit(ibmcloudj, 'is', 'public-gateways')
-  regions = e.submit(ibmcloudj, 'is', 'regions')
   securityGroups = e.submit(ibmcloudj,'is', 'security-groups')
   subnets = e.submit(ibmcloudj, 'is', 'subnets')
   vpcs = e.submit(ibmcloudj, 'is', 'vpcs')
   vpns = e.submit(ibmcloudj, 'is', 'vpn-gateways')
   volumes = e.submit(ibmcloudj, 'is', 'volumes')
+  target = e.submit(ibmcloudoj, 'target')
 
 def get_result(call):
   try:
@@ -43,17 +43,17 @@ all = {
   'load-balancers': get_result(loadBalancers),
   'network-acls': get_result(networkAcls),
   'public-gateways': get_result(publicGateways),
-  'regions': get_result(regions),
   'security-groups': get_result(securityGroups),
   'subnets': get_result(subnets),
   'vpcs': get_result(vpcs),
   'vpn-gateways': get_result(vpns),
   'volumes': get_result(volumes),
+  'region': get_result(target)['region'],
 }
 
 # add zones
-for region in all['regions']:
-  region['zones'] = ibmcloudj('is', 'zones', region['name'])
+region = all['region']
+region['zones'] = ibmcloudj('is', 'zones', region['name'])
 
 # add subnets under their vpcs
 vpcIdToVPC = {}
@@ -66,13 +66,7 @@ for subnet in all['subnets']:
 
 # set the VPC region to the region of the first subnet
 for vpc in all['vpcs']:
-  if len(vpc['subnets']) > 0:
-    subnetZone = vpc['subnets'][0]['zone']['name']
-    # find the region with this zone
-    for region in all['regions']:
-      for zone in region['zones']:
-        if (zone['name'] == subnetZone):
-          vpc['region'] = region['name']
+  vpc['region'] = region['name']
 
 # map subnet id to subnet
 subnetIdToSubnet = {}

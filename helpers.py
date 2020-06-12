@@ -34,6 +34,15 @@ def ibmcloudj(*args, **kwargs):
   iprint(Style.BRIGHT + cmd + Style.RESET_ALL)
   return json.loads(ibmcloud0(*args, json=True, **kwargs).stdout)
 
+def ibmcloudoj(*args, **kwargs):
+  cmd = 'ibmcloud'
+  for arg in args:
+    cmd = cmd + ' ' + str(arg)
+  for key, value in kwargs.items():
+    cmd = cmd + ' --' + key.replace('_', '-') + '=' + str(value)
+  iprint(Style.BRIGHT + cmd + Style.RESET_ALL)
+  return json.loads(ibmcloud0(*args, output='JSON', **kwargs).stdout)
+
 def ibmcloud(*args, **kwargs):
   cmd = 'ibmcloud'
   for arg in args:
