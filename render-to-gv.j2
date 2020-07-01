@@ -2,6 +2,7 @@ digraph G {
 
   graph [labeljust=l]
   bgcolor="{{styles.graph.fillcolor}}"
+  imagepath=".:/app"
 
   compound=true
   rankdir=LR
@@ -44,12 +45,14 @@ digraph G {
     label = ""
     color = "{{styles.graph.fillcolor}}"
     internet
+    margin = 10
   }
 
   // force security groups outside of IBM Cloud
   subgraph cluster_security_groups {
     label = ""
     color = "{{styles.graph.fillcolor}}"
+    margin = 10
 
     // SECURITY GROUPS
     {% for vpc in data.vpcs %}
@@ -88,8 +91,9 @@ digraph G {
   subgraph cluster_ibmcloud {
     label = <<BR/>  IBM Cloud>
     color = "{{styles.ibmcloud.color}}"
-    fillcolor = "{{styles.ibmcloud.color}}"
-    style = "rounded, filled"
+    style = "solid"
+    penwidth = 2
+    margin = 10
 
     // VPCs
     {% for vpc in data.vpcs %}
@@ -97,20 +101,23 @@ digraph G {
       label = <<BR/>  {{vpc.region }}>
       color = "{{styles.region.color}}"
       fillcolor = "{{styles.region.fillcolor}}"
-      style = "rounded, dotted, filled"
+      style = "solid"
+      penwidth = 2
+      margin = 10
 
       subgraph "cluster_{{ vpc.id }}" {
         label = <<BR/>  {{ vpc.name }} <I>({{ vpc.status }}) </I>>
         color = "{{styles.vpc.color}}"
-        fillcolor = "{{styles.vpc.color}}"
-        style = "rounded, filled"
+        style = "solid"
 
       // ZONES
       {% for zone in data.region.zones %}
       subgraph "cluster_{{vpc.id}}_{{ zone.name }}" {
         label = <<BR/>  {{ zone.name }}>
+        color = "{{styles.zone.color}}"
         fillcolor = "{{styles.zone.fillcolor}}"
-        style = "rounded, dashed, filled"
+        style = "solid, filled"
+        penwidth = 2
 
         // PUBLIC GATEWAYS
         {% for pgw in data['public-gateways'] %}
@@ -141,8 +148,10 @@ digraph G {
           {% if subnet.vpc.id == vpc.id and subnet.zone.name == zone.name %}
             subgraph "cluster_{{ subnet.id }}" {
               label = <<BR/>  {{ subnet.name }} - {{ subnet.ipv4_cidr_block }} <I>({{ subnet.status }})</I>>
+              color = "{{styles.subnet.color}}"
               fillcolor = "{{styles.subnet.fillcolor}}"
-              style = "rounded, filled"
+              style = "solid, filled"
+              penwidth = 2
 
               // invisible node to be able to attach Network ACLs
               "{{ subnet.id }}" [
