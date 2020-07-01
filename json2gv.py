@@ -20,10 +20,16 @@ with open('output/all.json', 'r') as allFile:
 with open(get_script_dir() + '/json2gv-styling.json', 'r') as styleFile:
   styles = json.load(styleFile)
 
-with open(get_script_dir() + '/render-to-gv.j2', 'r') as templateFile:
+# generate one global
+print('>>> Generating output/all.gv')
+with open(get_script_dir() + '/all-to-gv.j2', 'r') as templateFile:
   template = Template(templateFile.read())
+with open('output/all.gv', 'w') as allOutputFile:
+  allOutputFile.write(template.render(data=all, styles=styles))
 
 # generate one graphviz per vpc
+with open(get_script_dir() + '/render-to-gv.j2', 'r') as templateFile:
+  template = Template(templateFile.read())
 vpcs = all['vpcs']
 for vpc in vpcs:
   all['vpcs'] = [ 1 ]

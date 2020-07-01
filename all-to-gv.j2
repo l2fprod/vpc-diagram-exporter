@@ -1,0 +1,102 @@
+digraph G {
+
+  graph [labeljust=l]
+  bgcolor="{{styles.graph.fillcolor}}"
+  imagepath=".:/app"
+  
+  compound=true
+  rankdir=TB
+  ranksep=0.8
+  # ratio=0.8
+  pad=0.3
+  // splines="polyline"
+  fontname = "{{styles.graph.fontname}}"
+
+  label="Automatically generated with json2gv.py\nhttps://github.com/l2fprod/vpc-diagram-exporter"
+
+  node [
+    fontname = "{{styles.graph.fontname}}"
+    fontsize=12
+    fontcolor="{{styles.node.fontcolor}}"
+    width=1.1
+    shape = "box"
+  ]
+  edge [
+    fontname = "{{styles.graph.fontname}}"
+    fontsize=8
+    fontcolor="{{styles.node.fontcolor}}"
+    color="{{styles.edge.color}}"
+    arrowhead="vee"
+    style="dotted"
+  ]
+
+  internet [
+    label = "\nInternet\n "
+    shape = "egg"
+    fontsize=16
+    style="filled"
+    color="{{styles.internet.color}}"
+    fillcolor="{{styles.internet.fillcolor}}"
+    fontcolor="{{styles.internet.fontcolor}}"
+  ]
+
+  // force the internet outside of IBM Cloud
+  subgraph cluster_internet {
+    label = ""
+    color = "{{styles.graph.fillcolor}}"
+    internet
+  }
+
+  subgraph cluster_ibmcloud {
+    label = <<BR/>  IBM Cloud>
+    color = "{{styles.ibmcloud.color}}"
+    fillcolor = "{{styles.ibmcloud.color}}"
+    style = "solid"
+
+    // VPCs
+    {% for vpc in data.vpcs %}
+    subgraph "cluster_{{vpc.id}}_{{ vpc.region }}" {
+      label = <<BR/>  {{vpc.region }}>
+      color = "{{styles.region.color}}"
+      fillcolor = "{{styles.region.fillcolor}}"
+      style = "solid"
+
+      subgraph "cluster_{{ vpc.id }}" {
+        label = <<BR/>  {{ vpc.name }} <I>({{ vpc.status }}) </I>>
+        color = "{{styles.vpc.color}}"
+        fillcolor = "{{styles.vpc.color}}"
+        style = "solid"
+
+        // invisible node to be able to attach external objects to the VPC
+        "{{ vpc.id }}" [
+          style="invis"
+        ]
+      }
+    }
+    {% endfor %}
+
+    // TRANSIT GATEWAYS
+    {% for tg in data['transit-gateways'] %}
+      subgraph "cluster_{{tg.id}}" {
+        label = "{{tg.name}}"
+        style = "rounded"
+        "tg-{{tg.id}}" [
+          image="icons/transit.gateway.png"
+          label=""
+          color = "{{styles.tg.color}}"
+          fillcolor = "{{styles.tg.fillcolor}}"
+          style = "solid"
+          labelloc="c"
+          shape="none"
+        ]
+      }
+      {% for connection in tg.connections %}
+        {% for vpc in data.vpcs %}
+          {% if connection.network_id == vpc.crn %}
+            "tg-{{tg.id}}" -> "{{ vpc.id }}" [lhead="cluster_{{ vpc.id }}",ltail="cluster_{{tg.id}}"]
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+    {% endfor %}
+  }
+}

@@ -24,6 +24,7 @@ with ThreadPoolExecutor(max_workers=5) as e:
   vpns = e.submit(ibmcloudj, 'is', 'vpn-gateways')
   volumes = e.submit(ibmcloudj, 'is', 'volumes')
   target = e.submit(ibmcloudoj, 'target')
+  transitGateways = e.submit(ibmcloudoj, 'tg', 'gateways')
 
 def get_result(call):
   try:
@@ -49,6 +50,7 @@ all = {
   'vpn-gateways': get_result(vpns),
   'volumes': get_result(volumes),
   'region': get_result(target)['region'],
+  'transit-gateways': get_result(transitGateways)
 }
 
 # add zones
@@ -106,6 +108,10 @@ for vpn in all['vpn-gateways']:
 # retrieve VPC address prefixes
 for vpc in all['vpcs']:
   vpc['address_prefixes'] = ibmcloudj('is', 'vpc-address-prefixes', vpc['id'])
+
+# fill Transit Gateway connections
+for tg in all['transit-gateways']:
+  tg['connections'] = ibmcloudoj('tg', 'connections', tg['id'])
 
 # save the output
 if not os.path.exists('output'):

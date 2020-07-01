@@ -12,17 +12,17 @@
     "fontcolor": "#646365"
   },
   "ibmcloud": {
-    "color": "#9fd1f0"
+    "color": "#4F74B6"
   },
   "vpc": {
-    "color": "#96b1b6"
+    "color": "#4F74B6"
   },
   "address_prefixes": {
     "color": "#000000",
     "fillcolor": "#FFFFFF"
   },
   "region": {
-    "color": "#000000",
+    "color": "#A7A7A7",
     "fillcolor": "#e2f7f5"
   },
   "lb": {
@@ -30,11 +30,15 @@
     "fillcolor": "#a7e2fb"
   },
   "zone": {
-    "color": "",
-    "fillcolor": "#dbcabf"
+    "color": "#B6B6B6",
+    "fillcolor": "#EAEAEA"
   },
   "subnet": {
-    "color": "",
+    "color": "#3B8638",
+    "fillcolor": "#E8F0E3"
+  },
+  "tg": {
+    "color": "#4F74B6",
     "fillcolor": "#FFFFFF"
   },
   "server": {

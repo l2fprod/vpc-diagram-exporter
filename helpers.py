@@ -12,6 +12,9 @@ init()
 
 threadLocal = threading.local()
 
+new_env = os.environ.copy()
+new_env["IBMCLOUD_COLOR"] = "false"
+
 def makeLocal():
   if getattr(threadLocal, 'indent', None) is None:
     threadLocal.indent = 0
@@ -24,6 +27,10 @@ def iprint(string):
   else:
     print(Style.DIM + (' ' * threadLocal.indent * 2) + string + Style.RESET_ALL)
 
+def sanitize(output):
+  sanitized = output.decode("utf-8").replace("OK", "")
+  return sanitized
+
 # wraps ibmcloud and always use the JSON output
 def ibmcloudj(*args, **kwargs):
   cmd = 'ibmcloud'
@@ -32,7 +39,7 @@ def ibmcloudj(*args, **kwargs):
   for key, value in kwargs.items():
     cmd = cmd + ' --' + key.replace('_', '-') + '=' + str(value)
   iprint(Style.BRIGHT + cmd + Style.RESET_ALL)
-  return json.loads(ibmcloud0(*args, json=True, **kwargs).stdout)
+  return json.loads(sanitize(ibmcloud0(*args, json=True, _env=new_env, **kwargs).stdout))
 
 def ibmcloudoj(*args, **kwargs):
   cmd = 'ibmcloud'
@@ -41,7 +48,7 @@ def ibmcloudoj(*args, **kwargs):
   for key, value in kwargs.items():
     cmd = cmd + ' --' + key.replace('_', '-') + '=' + str(value)
   iprint(Style.BRIGHT + cmd + Style.RESET_ALL)
-  return json.loads(ibmcloud0(*args, output='JSON', **kwargs).stdout)
+  return json.loads(sanitize(ibmcloud0(*args, output='JSON', _env=new_env, **kwargs).stdout))
 
 def ibmcloud(*args, **kwargs):
   cmd = 'ibmcloud'
@@ -50,4 +57,4 @@ def ibmcloud(*args, **kwargs):
   for key, value in kwargs.items():
     cmd = cmd + ' --' + key.replace('_', '-') + '=' + str(value)
   iprint(Style.BRIGHT + cmd + Style.RESET_ALL)
-  return ibmcloud0(*args, **kwargs).stdout
+  return sanitize(ibmcloud0(*args, _env=new_env, **kwargs).stdout)

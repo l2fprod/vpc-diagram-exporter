@@ -1,8 +1,10 @@
 FROM alpine:3.9.2
 
 RUN apk --no-cache add --update \
+  bash \
   curl \
   graphviz \
+  jq \
   python3 \
   py3-pip \
   msttcorefonts-installer \
@@ -10,16 +12,19 @@ RUN apk --no-cache add --update \
   update-ms-fonts && \
   fc-cache -f
 
-RUN curl -fsSL https://clis.ng.bluemix.net/install/linux > /tmp/bxinstall.sh && \
-  sh /tmp/bxinstall.sh && \
-  rm /tmp/bxinstall.sh
+COPY vpc-diagram-exporter \
+  dump.py helpers.py \
+  json2gv-styling.json \
+  json2gv.py \
+  all-to-gv.j2 \
+  render-to-gv.j2 \
+  requirements.txt \
+  install.sh \
+  /app/
 
-RUN ibmcloud plugin install vpc-infrastructure -f -r "IBM Cloud"
-
-COPY vpc-diagram-exporter dump.py helpers.py json2gv-styling.json json2gv.py render-to-gv.j2 requirements.txt /app/
-RUN cd /app && pip3 install -r requirements.txt
+WORKDIR /app
+RUN ./install.sh
 
 ENV PATH="/app:${PATH}"
-
 VOLUME [ "/home" ]
 WORKDIR "/home"
