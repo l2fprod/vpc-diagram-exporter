@@ -74,7 +74,7 @@ digraph G {
       <TD>{{rule.direction}}</TD>
       <TD>{{rule.protocol}}</TD>
       <TD>{{rule.port_min}} - {{rule.port_max}}</TD>
-      <TD>{%if rule.remote %}{{rule.remote.cidr_block}}{{rule.remote.name}}{% endif %}</TD>
+      <TD>{%if rule.remote %}{{rule.remote.cidr_block}}{{rule.remote.address}}{{rule.remote.name}}{% endif %}</TD>
       </TR>
       {% endfor %}
       {% endif %}
