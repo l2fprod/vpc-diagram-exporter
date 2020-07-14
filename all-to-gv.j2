@@ -68,8 +68,27 @@ digraph G {
         style = "solid"
 
         // invisible node to be able to attach external objects to the VPC
+        // vpc address prefixes
         "{{ vpc.id }}" [
-          style="invis"
+          label = <
+          <TABLE BORDER="0">
+          <TR><TD colspan="2"><B>address prefixes</B></TD></TR>
+          <TR>
+            <TD>zone</TD>
+            <TD>cidr</TD>
+          </TR>
+          {% for prefix in vpc.address_prefixes %}
+          <TR>
+            <TD>{{prefix.zone.name}}</TD>
+            <TD>{{prefix.cidr}}</TD>
+          </TR>
+          {% endfor %}
+          </TABLE>
+          >
+          shape="component"
+          style="filled"
+          color = "{{styles.address_prefixes.color}}"
+          fillcolor = "{{styles.address_prefixes.fillcolor}}"
         ]
       }
     }
