@@ -199,7 +199,7 @@ digraph G {
                   {% for nic in server.network_interfaces %}
                     // LINK SERVER to ITS SECURITY GROUPS
                     {% for sg in nic.security_groups %}
-                      "{{ server.id }}" -> "{{ sg.id }}"
+                      "{{ server.id }}" -> "{{ sg.id }}" [label=">>> {{ sg.name}}"]
                     {% endfor %}
 
                     // IF THE SERVER HAS A FLOATING IP, IT HAS INBOUND/OUTBOUND ACCESS FROM/TO THE INTERNET
