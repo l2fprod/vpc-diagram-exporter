@@ -20,10 +20,6 @@ Use this tool to export a visual representation of the existing VPC resources in
    ```
 1. Set the VPC target generation:
    ```
-   ibmcloud is target --gen 1
-   ```
-   or
-   ```
    ibmcloud is target --gen 2
    ```
 1. Change to a directory under the `home` volume
@@ -121,7 +117,7 @@ Or to generate a PNG for a specific VPC:
 
 ## Documentation 
 
-- [IBM Cloud Virtual Private Cloud](https://cloud.ibm.com/docs/vpc-on-classic?topic=vpc-on-classic-getting-started)
+- [IBM Cloud Virtual Private Cloud](https://cloud.ibm.com/docs/vpc?topic=vpc-getting-started)
 
 ## License
 
