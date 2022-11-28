@@ -1,5 +1,7 @@
 #!/bin/bash
-curl -fsSL https://clis.ng.bluemix.net/install/linux > /tmp/bxinstall.sh && \
+set -e
+
+curl -fsSL https://clis.cloud.ibm.com/install/linux > /tmp/bxinstall.sh && \
   sh /tmp/bxinstall.sh && \
   rm /tmp/bxinstall.sh
 
@@ -8,7 +10,7 @@ ibmcloud plugin install tg -f -r "IBM Cloud"
 
 pip3 install -r requirements.txt
 
-curl -O https://mycatalog.mybluemix.net/generated/resources.json
+curl -O https://mycatalog.weworkinthecloud.com/generated/resources.json
 mkdir -p icons
 
 SERVICES=(
@@ -20,6 +22,6 @@ do
   pngIcon=$(cat resources.json | jq -r '.[] | select(.name=="'$service'") | .localPngIcon')
   pngIcon=${pngIcon/public/}
   echo "Downloading icon $pngIcon for $service"
-  curl -o icons/$service.png https://mycatalog.mybluemix.net$pngIcon
+  curl -o icons/$service.png https://mycatalog.weworkinthecloud.com$pngIcon
 done
 
